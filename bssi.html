@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ghadeer Accounts | نظام الحسابات</title>
+  <style>
+    :root{
+      --bg: #0f172a;           /* slate-900 */
+      --card: rgba(255,255,255,0.08);
+      --card-hover: rgba(255,255,255,0.12);
+      --text: #e5e7eb;         /* gray-200 */
+      --muted: #94a3b8;        /* slate-400 */
+      --accent: #38bdf8;       /* sky-400 */
+      --accent-2:#22d3ee;      /* cyan-400 */
+      --danger:#f43f5e;        /* rose-500 */
+      --success:#22c55e;       /* green-500 */
+      --warning:#f59e0b;       /* amber-500 */
+      --border: rgba(255,255,255,0.12);
+      --glass: blur(10px);
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:
+      radial-gradient(1200px 800px at 100% -10%, #1f2937 0%, transparent 60%),
+      radial-gradient(1000px 800px at -10% 110%, #172554 0%, transparent 60%),
+      var(--bg);
+      color:var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+      line-height:1.6;
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: var(--glass);
+      background: linear-gradient(180deg, rgba(15,23,42,.85), rgba(15,23,42,.55));
+      border-bottom:1px solid var(--border);
+    }
+    .container{max-width:1100px; margin:0 auto; padding:16px;}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand .logo{
+      width:40px; height:40px; display:grid; place-items:center; font-weight:700;
+      border-radius:10px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color:#00111a; box-shadow: var(--shadow);
+    }
+    .brand h1{font-size:18px; margin:0}
+    nav{
+      display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;
+    }
+    .tab{
+      border:1px solid var(--border); color:var(--text); background:var(--card);
+      padding:10px 14px; border-radius:10px; cursor:pointer; transition:.2s;
+    }
+    .tab.active, .tab:hover{background:var(--card-hover); border-color:rgba(255,255,255,.18)}
+    main{padding:18px 0 40px}
+    .grid{
+      display:grid; grid-template-columns: 1.2fr 1fr; gap:16px;
+    }
+    .card{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h2{margin:0 0 10px; font-size:18px}
+    .muted{color:var(--muted); font-size:14px}
+    .form-grid{
+      display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;
+    }
+    label{font-size:12px; color:var(--muted)}
+    input, select, textarea{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+      background: rgba(255,255,255,0.04); color:var(--text); outline:none;
+    }
+    input:focus, select:focus, textarea:focus{border-color:var(--accent)}
+    .actions{display:flex; gap:8px; flex-wrap:wrap}
+    .btn{
+      padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+      background:var(--card); color:var(--text); cursor:pointer;
+    }
+    .btn.primary{background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#06202b; border:0; font-weight:700}
+    .btn.danger{background: rgba(244,63,94,.12); border-color: rgba(244,63,94,.35); color:#fecdd3;}
+    .btn.ghost:hover{background:var(--card-hover)}
+    table{width:100%; border-collapse: collapse; font-size:14px}
+    thead th{
+      text-align:right; font-weight:600; color:#cbd5e1; border-bottom:1px solid var(--border); padding:10px 8px;
+    }
+    tbody td{border-bottom:1px dashed var(--border); padding:10px 8px}
+    .pill{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); background:rgba(255,255,255,.04)}
+    .pill.in{border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.08)}
+    .pill.out{border-color:rgba(244,63,94,.35); background:rgba(244,63,94,.08)}
+    .stats{display:grid; grid-template-columns: repeat(4, 1fr); gap:10px}
+    .stat{padding:12px; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.04)}
+    .stat h3{margin:4px 0; font-size:20px}
+    .stat small{color:var(--muted)}
+    .toolbar{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:8px}
+    .search{flex:1}
+    .row-actions{display:flex; gap:6px}
+    .right{text-align:left}
+    .balance-pos{color:#86efac}
+    .balance-neg{color:#fda4af}
+    .link{color:var(--accent); cursor:pointer; text-decoration:underline}
+    .footer-note{color:var(--muted); font-size:12px; text-align:center; margin-top:14px}
+    .hidden{display:none !important}
+
+    /* Drawer (كشف حساب العميل) */
+    .drawer{
+      position:fixed; inset:0; display:none; z-index:50;
+      background: rgba(0,0,0,.45);
+    }
+    .drawer.open{display:block}
+    .drawer-panel{
+      position:absolute; inset-block:0; inset-inline-start:0; width:min(680px, 100%);
+      background: #0b1224; border-inline-end:1px solid var(--border);
+      padding:16px 16px 90px; overflow:auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px){
+      .grid{grid-template-columns:1fr}
+      .form-grid{grid-template-columns: repeat(2, 1fr)}
+      .stats{grid-template-columns: repeat(2, 1fr)}
+    }
+    @media (max-width: 640px){
+      nav{gap:6px}
+      .tab{flex:1; text-align:center; padding:10px}
+      .form-grid{grid-template-columns: 1fr}
+      .toolbar{flex-direction:column; align-items:stretch}
+      .stats{grid-template-columns: 1fr 1fr}
+      thead{display:none}
+      table, tbody, tr, td{display:block; width:100%}
+      tbody tr{border:1px solid var(--border); border-radius:10px; margin:8px 0; padding:6px}
+      tbody td{border:0; display:flex; justify-content:space-between; gap:10px}
+      tbody td::before{content: attr(data-label); color:var(--muted)}
+      .right{text-align:right}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand">
+        <div class="logo">GL</div>
+        <div>
+          <h1>Ghadeer Accounts</h1>
+          <div class="muted">نظام حسابات بسيط وأنيق — يعمل على الجوال والكمبيوتر</div>
+        </div>
+      </div>
+      <nav id="tabs">
+        <button class="tab active" data-tab="clients">👥 العملاء</button>
+        <button class="tab" data-tab="transactions">🧾 فواتير/دفعات</button>
+        <button class="tab" data-tab="expenses">🛠️ المصروفات</button>
+        <button class="tab" data-tab="summary">📊 ملخص الشركة</button>
+        <button class="tab" data-tab="settings">⚙️ إعدادات</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- العملاء -->
+    <section id="clients" class="tab-pane">
+      <div class="grid">
+        <div class="card">
+          <h2>إضافة عميل</h2>
+          <div class="form-grid">
+            <div>
+              <label>اسم العميل</label>
+              <input id="c_name" placeholder="مثال: شركة شمال كردستان" />
+            </div>
+            <div>
+              <label>الهاتف</label>
+              <input id="c_phone" placeholder="07xxxxxxxx" />
+            </div>
+            <div>
+              <label>المدينة</label>
+              <input id="c_city" placeholder="أربيل" />
+            </div>
+            <div class="actions" style="align-items:end">
+              <button class="btn primary" id="addClientBtn">➕ إضافة</button>
+              <button class="btn ghost" id="importClientsBtn" title="استيراد من CSV">⬆️ استيراد CSV</button>
+              <button class="btn ghost" id="exportClientsBtn" title="تصدير العملاء">⬇️ تصدير</button>
+            </div>
+          </div>
+          <p class="muted">ملاحظة: الاسم يستخدم كمفتاح رئيسي. لو تكرر الاسم ستتم الإضافة لنفس العميل.</p>
+        </div>
+
+        <div class="card">
+          <div class="toolbar">
+            <div class="search" style="flex:1">
+              <label>بحث</label>
+              <input id="clientSearch" placeholder="ابحث بالاسم أو الهاتف..." oninput="renderClients()" />
+            </div>
+            <div>
+              <label>فرز</label>
+              <select id="clientSort" onchange="renderClients()">
+                <option value="name">حسب الاسم</option>
+                <option value="balanceDesc">الرصيد (تنازلي)</option>
+                <option value="balanceAsc">الرصيد (تصاعدي)</option>
+                <option value="invoices">عدد العمليات</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px; overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>العميل</th>
+                  <th>الهاتف</th>
+                  <th>المدينة</th>
+                  <th>العمليات</th>
+                  <th>الرصيد</th>
+                  <th class="right">خيارات</th>
+                </tr>
+              </thead>
+              <tbody id="clientRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="footer-note">يتم حفظ البيانات محليًا في المتصفح. يمكنك نسخ احتياطي من إعدادات النظام.</p>
+    </section>
+
+    <!-- فواتير/دفعات -->
+    <section id="transactions" class="tab-pane hidden">
+      <div class="grid">
+        <div class="card">
+          <h2>إضافة فاتورة / خدمة</h2>
+          <div class="form-grid">
+            <div>
+              <label>العميل</label>
+              <select id="t_client"></select>
+            </div>
+            <div>
+              <label>الوصف</label>
+              <input id="t_desc" placeholder="وصف الخدمة" />
+            </div>
+            <div>
+              <label>المبلغ</label>
+              <input id="t_amount" type="number" step="0.01" placeholder="0" />
+            </div>
+            <div>
+              <label>التاريخ</label>
+              <input id="t_date" type="date" />
+            </div>
+            <div class="actions" style="grid-column:1/-1">
+              <button class="btn primary" id="addInvoiceBtn">🧾 إضافة فاتورة</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>تسجيل دفعة مستلمة</h2>
+          <div class="form-grid">
+            <div>
+              <label>العميل</label>
+              <select id="p_client"></select>
+            </div>
+            <div>
+              <label>الوصف</label>
+              <input id="p_desc" placeholder="مثال: دفعة نقدية" />
+            </div>
+            <div>
+              <label>المبلغ</label>
+              <input id="p_amount" type="number" step="0.01" placeholder="0" />
+            </div>
+            <div>
+              <label>التاريخ</label>
+              <input id="p_date" type="date" />
+            </div>
+            <div class="actions" style="grid-column:1/-1">
+              <button class="btn primary" id="addPaymentBtn">💸 تسجيل دفعة</button>
+            </div>
+          </div>
+          <p class="muted">الدفعات تُقلّل رصيد العميل ولا تُحسب مصروفًا على الشركة.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- المصروفات -->
+    <section id="expenses" class="tab-pane hidden">
+      <div class="grid">
+        <div class="card">
+          <h2>إضافة مصروف عام</h2>
+          <div class="form-grid">
+            <div>
+              <label>الوصف</label>
+              <input id="e_desc" placeholder="وقود، صيانة، رواتب..." />
+            </div>
+            <div>
+              <label>المبلغ</label>
+              <input id="e_amount" type="number" step="0.01" placeholder="0" />
+            </div>
+            <div>
+              <label>التاريخ</label>
+              <input id="e_date" type="date" />
+            </div>
+            <div class="actions" style="grid-column:1/-1">
+              <button class="btn primary" id="addExpenseBtn">🛠️ إضافة مصروف</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>سجل المصروفات</h2>
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>الوصف</th>
+                  <th>المبلغ</th>
+                  <th class="right">خيارات</th>
+                </tr>
+              </thead>
+              <tbody id="expenseRows"></tbody>
+            </table>
+          </div>
+          <div class="actions" style="margin-top:10px">
+            <button class="btn ghost" id="exportExpensesBtn">⬇️ تصدير</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ملخص الشركة -->
+    <section id="summary" class="tab-pane hidden">
+      <div class="grid">
+        <div class="card">
+          <h2>ملخص سريع</h2>
+          <div class="stats">
+            <div class="stat">
+              <small>إجمالي الفواتير</small>
+              <h3 id="s_totalInvoices">-</h3>
+            </div>
+            <div class="stat">
+              <small>إجمالي الدفعات المستلمة</small>
+              <h3 id="s_totalPayments">-</h3>
+            </div>
+            <div class="stat">
+              <small>إجمالي المصروفات</small>
+              <h3 id="s_totalExpenses">-</h3>
+            </div>
+            <div class="stat">
+              <small>صافي الربح</small>
+              <h3 id="s_netProfit">-</h3>
+            </div>
+          </div>
+          <p class="muted">الربح = مجموع الفواتير − المصروفات. الدفعات لا تُخصم من ربح الشركة، بل من أرصدة العملاء.</p>
+        </div>
+
+        <div class="card">
+          <h2>أفضل العملاء (حسب إجمالي الفواتير)</h2>
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>العميل</th>
+                  <th>عدد الفواتير</th>
+                  <th>إجمالي فواتيره</th>
+                  <th>الرصيد الحالي</th>
+                </tr>
+              </thead>
+              <tbody id="topClientsRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- إعدادات -->
+    <section id="settings" class="tab-pane hidden">
+      <div class="card">
+        <h2>إعدادات ونسخ احتياطي</h2>
+        <div class="form-grid">
+          <div>
+            <label>العملة (رمز)</label>
+            <input id="currencyCode" placeholder="IQD, SAR, USD..." />
+          </div>
+          <div>
+            <label>تنسيق الأرقام</label>
+            <select id="localeSelect">
+              <option value="ar-IQ">ar-IQ (عراق)</option>
+              <option value="ar-SA">ar-SA (سعودية)</option>
+              <option value="en-US">en-US</option>
+              <option value="ar">ar (عربي)</option>
+            </select>
+          </div>
+          <div class="actions" style="grid-column:1/-1">
+            <button class="btn primary" id="saveSettingsBtn">💾 حفظ الإعدادات</button>
+          </div>
+        </div>
+        <hr style="border-color:var(--border); margin:16px 0">
+        <div class="actions">
+          <button class="btn" id="exportAllBtn">⬇️ تصدير كل البيانات (JSON)</button>
+          <button class="btn" id="importAllBtn">⬆️ استيراد (JSON)</button>
+          <button class="btn danger" id="resetBtn">🗑️ مسح كل البيانات</button>
+        </div>
+        <p class="muted">نصيحة عملية: صدّر نسخة احتياطية دوريًا، خصوصًا قبل تحديث المتصفح.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Drawer كشف حساب العميل -->
+  <div class="drawer" id="drawer">
+    <div class="drawer-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; position:sticky; top:0; background:#0b1224; padding-bottom:10px">
+        <div>
+          <h2 id="d_title" style="margin:0">كشف حساب</h2>
+          <div class="muted" id="d_subtitle"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="d_export">⬇️ تصدير</button>
+          <button class="btn" id="d_close">✖️ إغلاق</button>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top:8px">
+        <div class="search" style="flex:1">
+          <label>بحث في كشف الحساب</label>
+          <input id="d_search" placeholder="تصفية حسب الوصف..." />
+        </div>
+        <div>
+          <label>المدة</label>
+          <select id="d_range">
+            <option value="all">كل الوقت</option>
+            <option value="30">آخر 30 يوم</option>
+            <option value="90">آخر 90 يوم</option>
+            <option value="365">آخر سنة</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px; overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>البيان</th>
+              <th>النوع</th>
+              <th>المبلغ</th>
+              <th>الرصيد بعد العملية</th>
+              <th class="right">خيارات</th>
+            </tr>
+          </thead>
+          <tbody id="d_rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <input id="filePicker" type="file" accept=".json,.csv" class="hidden" />
+
+  <script>
+    /* =========================
+       تخزين البيانات (localStorage)
+       ========================= */
+    const STORAGE_KEY = 'ghadeer_accounts_v1';
+    const defaultState = {
+      clients: {}, // name -> {name, phone, city, ledger:[{id,type,desc,amount,date}]}
+      expenses: [], // [{id, desc, amount, date}]
+      settings: { currency: 'IQD', locale: 'ar-IQ' }
+    };
+    let state = loadState();
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+        // تطبيع
+        parsed.clients ??= {};
+        parsed.expenses ??= [];
+        parsed.settings ??= { currency:'IQD', locale:'ar-IQ' };
+        return parsed;
+      }catch(e){
+        console.warn('Bad state, resetting', e);
+        return structuredClone(defaultState);
+      }
+    }
+    function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+    /* =========================
+       أدوات مساعدة
+       ========================= */
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const today = () => new Date().toISOString().slice(0,10);
+    const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+    function fmt(n){
+      const {locale, currency} = state.settings;
+      try{
+        return Number(n).toLocaleString(locale || 'ar', { style:'currency', currency: currency || 'IQD' });
+      } catch {
+        return Number(n).toLocaleString(locale || 'ar') + ' ' + (state.settings.currency || 'IQD');
+      }
+    }
+
+    function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
+
+    /* =========================
+       تنقل التبويبات
+       ========================= */
+    $$('#tabs .tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        $$('#tabs .tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const id = btn.dataset.tab;
+        $$('.tab-pane').forEach(p=>p.classList.add('hidden'));
+        $('#'+id).classList.remove('hidden');
+        if(id==='summary') renderSummary();
+        if(id==='expenses') renderExpenses();
+        if(id==='transactions') syncClientSelects();
+        if(id==='clients') renderClients();
+      });
+    });
+
+    /* =========================
+       واجهة: العملاء
+       ========================= */
+    $('#addClientBtn').addEventListener('click', ()=>{
+      const name = $('#c_name').value.trim();
+      const phone = $('#c_phone').value.trim();
+      const city = $('#c_city').value.trim();
+      if(!name){ alert('أدخل اسم العميل'); return; }
+
+      const key = name; // الاسم مفتاح
+      if(!state.clients[key]){
+        state.clients[key] = { name, phone, city, ledger:[] };
+      }else{
+        // تحديث بيانات موجودة
+        state.clients[key].phone = phone || state.clients[key].phone;
+        state.clients[key].city  = city  || state.clients[key].city;
+      }
+      saveState();
+      $('#c_name').value = ''; $('#c_phone').value=''; $('#c_city').value='';
+      renderClients(); syncClientSelects();
+    });
+
+    $('#exportClientsBtn').addEventListener('click', ()=>{
+      const rows = Object.values(state.clients).map(c=>({
+        name:c.name, phone:c.phone||'', city:c.city||'',
+        operations:c.ledger.length,
+        balance: calcClientBalance(c.name)
+      }));
+      downloadJSON(rows, 'clients_export.json');
+    });
+
+    $('#importClientsBtn').addEventListener('click', ()=>{
+      pickFile('.csv', (text)=>{
+        // CSV بسيط: name,phone,city
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        for(const line of lines){
+          const [name, phone='', city=''] = line.split(',').map(s=>s?.trim());
+          if(!name) continue;
+          if(!state.clients[name]) state.clients[name] = { name, phone, city, ledger:[] };
+        }
+        saveState(); renderClients(); syncClientSelects();
+      });
+    });
+
+    $('#clientSearch').addEventListener('input', renderClients);
+    $('#clientSort').addEventListener('change', renderClients);
+
+    function renderClients(){
+      const tbody = $('#clientRows'); tbody.innerHTML = '';
+      const q = $('#clientSearch').value.trim().toLowerCase();
+      const sort = $('#clientSort').value;
+      let list = Object.values(state.clients);
+      if(q){
+        list = list.filter(c =>
+          (c.name||'').toLowerCase().includes(q) ||
+          (c.phone||'').toLowerCase().includes(q) ||
+          (c.city||'').toLowerCase().includes(q)
+        );
+      }
+      list.forEach(c=> c.balance = calcClientBalance(c.name));
+      if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name, 'ar'));
+      if(sort==='balanceDesc') list.sort((a,b)=>b.balance-a.balance);
+      if(sort==='balanceAsc') list.sort((a,b)=>a.balance-b.balance);
+      if(sort==='invoices') list.sort((a,b)=>b.ledger.length - a.ledger.length);
+
+      for(const c of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="العميل">${escapeHtml(c.name)}</td>
+          <td data-label="الهاتف">${escapeHtml(c.phone||'-')}</td>
+          <td data-label="المدينة">${escapeHtml(c.city||'-')}</td>
+          <td data-label="العمليات">${c.ledger.length}</td>
+          <td data-label="الرصيد">
+            <span class="${c.balance>=0?'balance-pos':'balance-neg'}">${fmt(c.balance)}</span>
+          </td>
+          <td class="right" data-label="خيارات">
+            <div class="row-actions">
+              <button class="btn" onclick="openStatement('${escapeAttr(c.name)}')">👁️ كشف</button>
+              <button class="btn" onclick="quickInvoice('${escapeAttr(c.name)}')">🧾 فاتورة</button>
+              <button class="btn" onclick="quickPayment('${escapeAttr(c.name)}')">💸 دفعة</button>
+              <button class="btn danger" onclick="deleteClient('${escapeAttr(c.name)}')">🗑️ حذف</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function deleteClient(name){
+      if(confirm('حذف العميل وجميع عملياته؟')) {
+        delete state.clients[name]; saveState(); renderClients(); syncClientSelects();
+      }
+    }
+
+    function quickInvoice(name){
+      $('#t_client').value = name;
+      $$('#tabs .tab').find(b=>b.dataset.tab==='transactions').click();
+      $('#t_desc').focus();
+    }
+    function quickPayment(name){
+      $('#p_client').value = name;
+      $$('#tabs .tab').find(b=>b.dataset.tab==='transactions').click();
+      $('#p_desc').focus();
+    }
+
+    function calcClientBalance(name){
+      const c = state.clients[name]; if(!c) return 0;
+      let bal = 0;
+      // الفاتورة = موجب، الدفعة = سالب على رصيد العميل
+      for(const op of c.ledger){
+        if(op.type==='invoice') bal += Number(op.amount||0);
+        if(op.type==='payment') bal -= Number(op.amount||0);
+      }
+      return bal;
+    }
+
+    /* =========================
+       واجهة: فواتير/دفعات
+       ========================= */
+    function syncClientSelects(){
+      const names = Object.keys(state.clients).sort((a,b)=>a.localeCompare(b,'ar'));
+      for(const id of ['t_client','p_client']){
+        const el = $('#'+id); el.innerHTML = '';
+        for(const n of names){
+          const o = document.createElement('option'); o.value = n; o.textContent = n;
+          el.appendChild(o);
+        }
+      }
+    }
+
+    $('#addInvoiceBtn').addEventListener('click', ()=>{
+      const client = $('#t_client').value;
+      const desc = $('#t_desc').value.trim();
+      const amount = Number($('#t_amount').value);
+      const date = $('#t_date').value || today();
+      if(!client){ alert('اختر العميل'); return; }
+      if(!(amount>0)){ alert('أدخل مبلغًا صحيحًا'); return; }
+
+      state.clients[client].ledger.push({ id:uid(), type:'invoice', desc, amount, date });
+      saveState();
+      $('#t_desc').value=''; $('#t_amount').value=''; $('#t_date').value='';
+      renderClients(); renderSummary();
+      alert('تمت إضافة الفاتورة.');
+    });
+
+    $('#addPaymentBtn').addEventListener('click', ()=>{
+      const client = $('#p_client').value;
+      const desc = $('#p_desc').value.trim();
+      const amount = Number($('#p_amount').value);
+      const date = $('#p_date').value || today();
+      if(!client){ alert('اختر العميل'); return; }
+      if(!(amount>0)){ alert('أدخل مبلغًا صحيحًا'); return; }
+
+      state.clients[client].ledger.push({ id:uid(), type:'payment', desc, amount, date });
+      saveState();
+      $('#p_desc').value=''; $('#p_amount').value=''; $('#p_date').value='';
+      renderClients(); renderSummary();
+      alert('تم تسجيل الدفعة.');
+    });
+
+    /* =========================
+       واجهة: المصروفات
+       ========================= */
+    $('#addExpenseBtn').addEventListener('click', ()=>{
+      const desc = $('#e_desc').value.trim();
+      const amount = Number($('#e_amount').value);
+      const date = $('#e_date').value || today();
+      if(!(amount>0)){ alert('أدخل مبلغًا صحيحًا'); return; }
+      state.expenses.push({ id:uid(), desc, amount, date });
+      saveState();
+      $('#e_desc').value=''; $('#e_amount').value=''; $('#e_date').value='';
+      renderExpenses(); renderSummary();
+    });
+
+    function renderExpenses(){
+      const tbody = $('#expenseRows'); tbody.innerHTML='';
+      const rows = [...state.expenses].sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+      for(const e of rows){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="التاريخ">${escapeHtml(e.date||'-')}</td>
+          <td data-label="الوصف">${escapeHtml(e.desc||'-')}</td>
+          <td data-label="المبلغ">${fmt(e.amount||0)}</td>
+          <td data-label="خيارات" class="right">
+            <div class="row-actions">
+              <button class="btn danger" onclick="deleteExpense('${e.id}')">🗑️ حذف</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+    function deleteExpense(id){
+      if(!confirm('حذف المصروف؟')) return;
+      state.expenses = state.expenses.filter(x=>x.id!==id);
+      saveState(); renderExpenses(); renderSummary();
+    }
+    $('#exportExpensesBtn').addEventListener('click', ()=>{
+      downloadJSON(state.expenses, 'expenses_export.json');
+    });
+
+    /* =========================
+       واجهة: ملخص الشركة
+       ========================= */
+    function renderSummary(){
+      const allClients = Object.values(state.clients);
+      const invoicesTotal = sum(allClients.flatMap(c => c.ledger.filter(x=>x.type==='invoice').map(x=>x.amount)));
+      const paymentsTotal = sum(allClients.flatMap(c => c.ledger.filter(x=>x.type==='payment').map(x=>x.amount)));
+      const expensesTotal = sum(state.expenses.map(e=>e.amount));
+      const netProfit = invoicesTotal - expensesTotal;
+
+      $('#s_totalInvoices').textContent = fmt(invoicesTotal);
+      $('#s_totalPayments').textContent = fmt(paymentsTotal);
+      $('#s_totalExpenses').textContent = fmt(expensesTotal);
+      $('#s_netProfit').textContent = fmt(netProfit);
+
+      // أفضل العملاء
+      const tbody = $('#topClientsRows'); tbody.innerHTML='';
+      const ranked = allClients
+        .map(c=>{
+          const inv = sum(c.ledger.filter(x=>x.type==='invoice').map(x=>x.amount));
+          const bal = calcClientBalance(c.name);
+          return {name:c.name, inv, count:c.ledger.filter(x=>x.type==='invoice').length, bal};
+        })
+        .sort((a,b)=> b.inv - a.inv)
+        .slice(0, 10);
+      for(const r of ranked){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="العميل">${escapeHtml(r.name)}</td>
+          <td data-label="عدد الفواتير">${r.count}</td>
+          <td data-label="إجمالي فواتيره">${fmt(r.inv)}</td>
+          <td data-label="الرصيد الحالي">
+            <span class="${r.bal>=0?'balance-pos':'balance-neg'}">${fmt(r.bal)}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    /* =========================
+       كشف حساب العميل (Drawer)
+       ========================= */
+    const drawer = $('#drawer');
+    $('#d_close').addEventListener('click', ()=> drawer.classList.remove('open'));
+    $('#d_search').addEventListener('input', ()=> renderStatement(currentStatementName));
+    $('#d_range').addEventListener('change', ()=> renderStatement(currentStatementName));
+    $('#d_export').addEventListener('click', ()=>{
+      if(!currentStatementName) return;
+      const rows = buildStatementRows(currentStatementName, true).map(r=>({
+        date:r.date, desc:r.desc, type:r.type, amount:r.amount, balance:r.balance
+      }));
+      downloadJSON(rows, `statement_${safeFileName(currentStatementName)}.json`);
+    });
+    let currentStatementName = null;
+
+    function openStatement(name){
+      currentStatementName = name;
+      $('#d_title').textContent = 'كشف حساب';
+      const c = state.clients[name];
+      $('#d_subtitle').textContent = `${c.name} — ${c.phone||'-'} — ${c.city||'-'}`;
+      $('#d_search').value=''; $('#d_range').value='all';
+      renderStatement(name);
+      drawer.classList.add('open');
+    }
+
+    function renderStatement(name){
+      const tbody = $('#d_rows'); tbody.innerHTML='';
+      if(!name) return;
+      const rows = buildStatementRows(name);
+      let running = 0;
+      for(const r of rows){
+        running += (r.type==='invoice'? Number(r.amount): -Number(r.amount));
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="التاريخ">${escapeHtml(r.date||'-')}</td>
+          <td data-label="البيان">${escapeHtml(r.desc||'-')}</td>
+          <td data-label="النوع">
+            <span class="pill ${r.type==='invoice'?'in':'out'}">
+              ${r.type==='invoice'?'فاتورة':'دفعة'}
+            </span>
+          </td>
+          <td data-label="المبلغ">${fmt(r.amount||0)}</td>
+          <td data-label="الرصيد بعد العملية">${fmt(running)}</td>
+          <td data-label="خيارات" class="right">
+            <div class="row-actions">
+              <button class="btn" onclick="editOp('${escapeAttr(name)}','${r.id}')">✏️ تعديل</button>
+              <button class="btn danger" onclick="deleteOp('${escapeAttr(name)}','${r.id}')">🗑️ حذف</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function buildStatementRows(name, raw=false){
+      const q = $('#d_search').value?.trim().toLowerCase() || '';
+      const range = $('#d_range').value;
+      const sinceDays = range==='all'? null : Number(range);
+      const c = state.clients[name];
+      const now = new Date();
+      let list = [...c.ledger];
+
+      list.sort((a,b)=> (a.date||'').localeCompare(b.date||'') || a.id.localeCompare(b.id));
+
+      if(q) list = list.filter(x=> (x.desc||'').toLowerCase().includes(q));
+      if(sinceDays){
+        const since = new Date(now.getTime() - sinceDays*24*60*60*1000);
+        list = list.filter(x=> (x.date && new Date(x.date) >= since));
+      }
+      if(raw) return list.map(x=>({...x}));
+      return list.map(x=>({id:x.id, date:x.date, desc:x.desc, type:x.type, amount:Number(x.amount)}));
+    }
+
+    function editOp(name, opId){
+      const c = state.clients[name];
+      const op = c.ledger.find(x=>x.id===opId);
+      if(!op) return;
+      const newDesc = prompt('وصف العملية:', op.desc||'') ?? op.desc;
+      const newAmount = Number(prompt('المبلغ:', op.amount) ?? op.amount);
+      const newDate = prompt('التاريخ (YYYY-MM-DD):', op.date||today()) ?? op.date;
+      if(!(newAmount>0)){ alert('المبلغ غير صالح'); return; }
+      op.desc = newDesc; op.amount = newAmount; op.date = newDate;
+      saveState(); renderClients(); renderStatement(name); renderSummary();
+    }
+    function deleteOp(name, opId){
+      if(!confirm('حذف العملية؟')) return;
+      const c = state.clients[name];
+      c.ledger = c.ledger.filter(x=>x.id!==opId);
+      saveState(); renderClients(); renderStatement(name); renderSummary();
+    }
+
+    /* =========================
+       إعدادات ونسخ احتياطي
+       ========================= */
+    $('#currencyCode').value = state.settings.currency || 'IQD';
+    $('#localeSelect').value = state.settings.locale || 'ar-IQ';
+
+    $('#saveSettingsBtn').addEventListener('click', ()=>{
+      state.settings.currency = $('#currencyCode').value.trim() || 'IQD';
+      state.settings.locale = $('#localeSelect').value || 'ar-IQ';
+      saveState(); renderClients(); renderExpenses(); renderSummary();
+      alert('تم حفظ الإعدادات');
+    });
+
+    $('#exportAllBtn').addEventListener('click', ()=>{
+      downloadJSON(state, 'ghadeer_backup.json');
+    });
+
+    $('#importAllBtn').addEventListener('click', ()=>{
+      pickFile('.json', (text)=>{
+        try{
+          const data = JSON.parse(text);
+          state = data; saveState();
+          // إعادة رندر
+          $('#currencyCode').value = state.settings.currency || 'IQD';
+          $('#localeSelect').value = state.settings.locale || 'ar-IQ';
+          renderClients(); renderExpenses(); renderSummary(); syncClientSelects();
+          alert('تم الاستيراد بنجاح');
+        }catch(e){ alert('ملف غير صالح'); }
+      });
+    });
+
+    $('#resetBtn').addEventListener('click', ()=>{
+      if(confirm('مسح كل البيانات؟ لا يمكن التراجع.')){
+        state = structuredClone(defaultState); saveState();
+        renderClients(); renderExpenses(); renderSummary(); syncClientSelects();
+      }
+    });
+
+    /* =========================
+       أدوات تنزيل/رفع
+       ========================= */
+    function downloadJSON(obj, filename){
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+    function pickFile(accept, ontext){
+      const fp = $('#filePicker'); fp.value=''; fp.accept = accept;
+      fp.onchange = ()=>{
+        const f = fp.files[0]; if(!f) return;
+        const r = new FileReader();
+        r.onload = ()=> ontext(r.result);
+        r.readAsText(f, 'utf-8');
+      };
+      fp.click();
+    }
+
+    /* =========================
+       حِماية بسيطة وإخراج آمن
+       ========================= */
+    function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function escapeAttr(s=''){ return s.replace(/['"]/g, m=> (m==='"'?'&quot;':'&#39;')); }
+    function safeFileName(s=''){ return s.replace(/[^-\w]+/g,'_'); }
+
+    /* =========================
+       تهيئة أولية
+       ========================= */
+    function init(){
+      // تعبئة تواريخ اليوم
+      $('#t_date').value = today();
+      $('#p_date').value = today();
+      $('#e_date').value = today();
+      syncClientSelects();
+      renderClients();
+      renderExpenses();
+      renderSummary();
+    }
+    init();
+
+    // إغلاق الدروار عند النقر خارج اللوحة
+    drawer.addEventListener('click', (e)=> {
+      if(e.target === drawer) drawer.classList.remove('open');
+    });
+
+    // واجهات عامة للوصول من HTML
+    window.openStatement = openStatement;
+    window.deleteClient = deleteClient;
+    window.quickInvoice = quickInvoice;
+    window.quickPayment = quickPayment;
+    window.deleteExpense = deleteExpense;
+    window.editOp = editOp;
+    window.deleteOp = deleteOp;
+
+  </script>
+</body>
+</html>
