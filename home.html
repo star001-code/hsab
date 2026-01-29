@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الرئيسية | شركة الغدير للنقل والتخليص الكمركي</title>
+<link rel="stylesheet" href="assets/css/mobile.css">
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Cairo", sans-serif;
+  background: linear-gradient(180deg,#f7faff,#eef5ff);
+  color: #000;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== الهيدر ===== */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: linear-gradient(90deg,#003366,#004b95);
+  color: #fff;
+  padding: 1.2rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  border-bottom: 3px solid #c2a356;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.brand img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+}
+.brand-name span {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+.brand-name small {
+  color: #f8e9b3;
+  font-size: .95rem;
+}
+
+/* ===== القائمة ===== */
+nav {
+  position: relative;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+nav a:hover {
+  color: #fcd670;
+}
+
+/* Mobile Menu */
+.menu-toggle {
+  display: none;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 0 0 14px 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 1000;
+  padding: 10px 0;
+}
+.mobile-menu.open { display: block; }
+.mobile-menu a {
+  display: block;
+  padding: 12px 20px;
+  color: #004b95;
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 1px solid #f0f0f0;
+}
+.mobile-menu a:last-child { border-bottom: none; }
+.mobile-menu a:hover { background: #f5f8ff; }
+
+@media (max-width: 768px) {
+  header {
+    flex-wrap: wrap;
+    padding: 0.8rem 1rem;
+    gap: 10px;
+  }
+  .brand img { width: 50px; height: 50px; }
+  .brand-name span { font-size: 1.1rem; }
+  .brand-name small { font-size: 0.8rem; }
+  nav ul { display: none; }
+  .menu-toggle { display: block; }
+}
+
+/* ===== المحتوى الرئيسي ===== */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3rem 1rem 4rem;
+  box-sizing: border-box;
+}
+h1 {
+  color: #004b95;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #c2a356;
+  padding-bottom: 8px;
+  text-align: center;
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.dashboard-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 2rem;
+  text-align: center;
+  border-top: 4px solid #004b95;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,75,149,0.2);
+}
+.dashboard-card h3 {
+  color: #004b95;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.dashboard-card p {
+  color: #666;
+  font-size: 0.95rem;
+}
+.dashboard-card a {
+  display: block;
+  margin-top: 1rem;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(90deg,#004b95,#008d5f);
+  padding: 10px 0;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.dashboard-card a:hover {
+  opacity: 0.9;
+}
+
+/* ===== الفوتر ===== */
+footer {
+  background: #fafafa;
+  text-align: center;
+  padding: 1.5rem;
+  border-top: 1px solid #ddd;
+  color: #000;
+  font-size: .95rem;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="ghadeer-logo.png" alt="ghadeer logo">
+    <div class="brand-name">
+      <span>شركة الغدير</span><br>
+      <small>للنقل والتخليص الكمركي</small>
+    </div>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="home.html">الرئيسية</a></li>
+      <li><a href="client.html">العملاء</a></li>
+      <li><a href="client-statement.html">الفواتير</a></li>
+      <li><a href="client-account.html">كشف الحساب</a></li>
+      <li><a href="expenses.html">المصروفات</a></li>
+    </ul>
+    <button class="menu-toggle" id="menuToggle" type="button">☰</button>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="home.html">🏠 الرئيسية</a>
+      <a href="client.html">👥 العملاء</a>
+      <a href="client-statement.html">🧾 الفواتير</a>
+      <a href="client-account.html">📊 كشف الحساب</a>
+      <a href="expenses.html">💰 المصروفات</a>
+    </div>
+  </nav>
+</header>
+<script>
+(function(){
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  if (!toggle || !menu) return;
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('open');
+  });
+  document.addEventListener('click', () => menu.classList.remove('open'));
+})();
+</script>
+<script src="assets/js/ghadeer-db.js"></script>
+<main>
+  <h1>لوحة التحكم الرئيسية</h1>
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <h3>👥 العملاء</h3>
+      <p>إدارة وإضافة عملاء جدد</p>
+      <a href="client.html">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>🧾 الوصولات</h3>
+      <p>عرض وتحرير وصولات العملاء</p>
+      <a href="client-statement.html">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>📊 كشف الحساب</h3>
+      <p>مراجعة العمليات المالية والرصيد</p>
+      <a href="client-account.html">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>💰 المصروفات</h3>
+      <p>إضافة وتتبع مصروفات الشركة</p>
+      <a href="expenses.html">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>📝 الملاحظات</h3>
+      <p>تدوين الملاحظات الإدارية</p>
+      <a href="notes.html">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>📋 الحالات</h3>
+      <p>متابعة الحالات والإجراءات</p>
+      <a href="notes.html#statuses">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>📈 كشف الحساب العام</h3>
+      <p>ملخص شامل لجميع العملاء والمصروفات</p>
+      <a href="general-statement.html">فتح</a>
+    </div>
+    <div class="dashboard-card">
+      <h3>📋 جميع العمليات</h3>
+      <p>عرض الوصولات والقبوضات مع البحث</p>
+      <a href="all-operations.html">فتح</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  📍 زاخو – إبراهيم الخليل • 📞 07504084359 • 📧 starzeki001@gmail.com  
+  <br>© 2026 شركة الغدير للنقل والتخليص الكمركي – جميع الحقوق محفوظة
+</footer>
+
+</body>
+</html>
