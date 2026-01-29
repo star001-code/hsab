@@ -68,10 +68,11 @@
       const password = document.getElementById('password').value;
       const errorMessage = document.getElementById('error_message');
 
-      if(username === 'star' && password === 'star') {
+      // تحقق من بيانات الدخول
+      if (username.trim().toLowerCase() === 'star' && password === 'star') {
         alert('تم تسجيل الدخول بنجاح!');
         errorMessage.textContent = '';
-        // يمكنك إعادة توجيه المستخدم هنا
+        window.location.href = "home.html"; // إعادة التوجيه إلى صفحة رئيسية
       } else {
         errorMessage.textContent = 'خطأ: اسم المستخدم أو كلمة المرور غير صحيحة';
       }
